@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baralho DISC</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --texto: #210000;
+  --fundo: #f5f7fa;
+  --azul-escuro: #001B71;
+  --azul: #007BEA;
+  /* cor de destaque do perfil ativo (escura, media, clara) */
+  --p-escura: #62003B;
+  --p-media: #E6233A;
+  --p-clara: #F9CBD2;
+}
+
+body {
+  font-family: 'Aptos', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+h1, h2, h3, .titulo {
+  font-family: 'Raleway', 'Segoe UI', sans-serif;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 24px;
+  border-bottom: 1px solid #e6eaf0;
+}
+.header .logo img { height: 30px; display: block; }
+.header .tag {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--azul-escuro);
+  background: #B3DFFF;
+  border-radius: 12px;
+  padding: 6px 12px;
+}
+
+.intro { padding: 28px 24px 8px; }
+.intro h1 { font-size: 30px; line-height: 1.15; }
+.intro p { margin-top: 8px; font-size: 16px; line-height: 1.5; max-width: 640px; }
+
+/* Seletor de perfil */
+.perfis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 20px 24px 8px;
+}
+.perfil-btn {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--texto);
+  background: #fff;
+  border: 2px solid #d9dee6;
+  border-radius: 12px;
+  padding: 14px 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.perfil-btn .bolinha {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--c-media);
+  flex: none;
+}
+.perfil-btn:hover { border-color: var(--c-media); background: var(--c-clara); }
+.perfil-btn[aria-selected="true"] {
+  background: var(--c-escura);
+  border-color: var(--c-escura);
+  color: #fff;
+}
+.perfil-btn[aria-selected="true"] .bolinha { background: var(--c-clara); }
+.perfil-btn:focus-visible, .acao:focus-visible, .carta:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 3px;
+}
+
+/* Barra de ações */
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 24px 8px;
+}
+.barra h2 { font-size: 22px; color: var(--p-escura); }
+.acao {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  background: var(--azul);
+  border: none;
+  border-radius: 8px;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.acao:hover { background: #0063c5; }
+
+/* Cartas */
+.grade {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  padding: 16px 24px 32px;
+}
+.carta {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  perspective: 1200px;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.carta-interna {
+  display: grid;
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+  min-height: 260px;
+  height: 100%;
+}
+.carta[aria-pressed="true"] .carta-interna { transform: rotateY(180deg); }
+.face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+}
+.frente {
+  background: var(--p-escura);
+  color: #fff;
+  justify-content: space-between;
+  border-bottom: 8px solid var(--p-media);
+}
+.frente .perfil-nome {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--p-clara);
+}
+.frente .letra {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 96px;
+  line-height: 1;
+  color: var(--p-clara);
+  opacity: 0.9;
+}
+.frente .categoria {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.15;
+  color: #fff;
+}
+.frente .dica { font-size: 13px; color: var(--p-clara); margin-top: 8px; }
+
+.verso {
+  background: var(--p-clara);
+  color: var(--texto);
+  transform: rotateY(180deg);
+  border-top: 8px solid var(--p-media);
+}
+.verso .cat {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--p-escura);
+  margin-bottom: 12px;
+}
+.verso ul { list-style: none; display: grid; gap: 9px; }
+.verso li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15.5px;
+  line-height: 1.4;
+}
+.verso li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 7px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--p-escura);
+}
+
+.rodape {
+  padding: 16px 24px 24px;
+  font-size: 13px;
+  border-top: 1px solid #e6eaf0;
+}
+
+@media (max-width: 900px) {
+  .grade { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  body { padding: 16px 12px; }
+  .header, .intro, .barra { padding-left: 16px; padding-right: 16px; }
+  .perfis { padding-left: 16px; padding-right: 16px; gap: 8px; }
+  .perfil-btn { font-size: 15px; padding: 12px 4px; gap: 6px; flex-direction: column; }
+  .grade { grid-template-columns: 1fr; padding: 12px 16px 24px; }
+  .intro h1 { font-size: 24px; }
+  .carta-interna { min-height: 220px; }
+  .frente .letra { font-size: 72px; }
+  .frente .categoria { font-size: 21px; }
+  .header .tag { display: none; }
+  .barra h2 { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .carta-interna { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="logo"><img src="data:image/png;base64,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" alt="Crescimentum"></div>
+    <span class="tag">Baralho</span>
+  </header>
+
+  <section class="intro">
+    <h1>Baralho DISC</h1>
+    <p>Escolha um perfil e clique nas cartas para virar. Cada perfil tem cinco cartas: características, como delegar, como dar feedback, como negociar e como desenvolver.</p>
+  </section>
+
+  <nav class="perfis" role="tablist" aria-label="Perfis DISC" id="perfis"></nav>
+
+  <div class="barra">
+    <h2 id="tituloPerfil"></h2>
+    <button class="acao" id="virarTodas" type="button">Virar todas as cartas</button>
+  </div>
+
+  <main class="grade" id="grade" role="tabpanel" aria-live="polite"></main>
+
+  <footer class="rodape">Clique ou use Enter/Espaço em uma carta para virá-la.</footer>
+</div>
+
+<script>
+const PERFIS = {
+  D: {
+    nome: "Alto D",
+    cores: { escura: "#62003B", media: "#E6233A", clara: "#F9CBD2" },
+    cartas: [
+      { categoria: "Características", itens: [
+        "Rápidas, impacientes e objetivas",
+        "Competitivas, orientadas para superação de metas",
+        "Corajosas, tomam decisões rápidas",
+        "Necessidade de agir com rapidez",
+        "Desafiam a si mesmas e às outras pessoas" ] },
+      { categoria: "Como delegar", itens: [
+        "Determinar o objetivo e os resultados esperados",
+        "Dar autonomia",
+        "Meta desafiadora",
+        "Cobrar resultados",
+        "Ver se está atropelando pessoas" ] },
+      { categoria: "Como dar feedback", itens: [
+        "Ter objetividade, indo ao ponto rapidamente.",
+        "Focar em resultados, mostrando como o feedback impacta os objetivos.",
+        "Oferecer soluções práticas, evitando críticas sem direcionamento.",
+        "Reconhecer conquistas de forma rápida e eficaz." ] },
+      { categoria: "Como negociar", itens: [
+        "Apresentar opções ou alternativas para mostrar flexibilidade.",
+        "Manter o foco no objetivo final, destacando os benefícios.",
+        "Manter a postura firme e confiante, sem hesitar." ] },
+      { categoria: "Como desenvolver", itens: [
+        "Dar autonomia",
+        "Delegar muito / desafiar",
+        "Empoderar quando possível",
+        "Não exercer excesso de cobrança",
+        "Deixar claro os ganhos para o desenvolvimento" ] }
+    ]
+  },
+  I: {
+    nome: "Alto I",
+    cores: { escura: "#876300", media: "#FFB93E", clara: "#FFF0C6" },
+    cartas: [
+      { categoria: "Características", itens: [
+        "Comunicativas, influentes e sociáveis",
+        "Inspiradoras, motivam as pessoas",
+        "Irradiam otimismo",
+        "Confiantes",
+        "Procuram interagir e verbalizar intensamente",
+        "Causam boa impressão" ] },
+      { categoria: "Como delegar", itens: [
+        "Mostrar benefícios para o grupo",
+        "Mais pontos de controle",
+        "Ser otimista, entusiasta",
+        "Fazer de maneira informal, pessoalizada" ] },
+      { categoria: "Como dar feedback", itens: [
+        "Impacto nas pessoas",
+        "Em contexto descontraído (almoço, por exemplo)",
+        "Negativo em privacidade e positivo, em público",
+        "Usar abordagem informal" ] },
+      { categoria: "Como negociar", itens: [
+        "Mostrar disponibilidade para conversar",
+        "Buscar afinidades com a pessoa",
+        "Trazer reconhecimentos",
+        "Começar com quebragelo" ] },
+      { categoria: "Como desenvolver", itens: [
+        "Investir no relacionamento",
+        "Ter presença nos momentos em conjunto",
+        "Oferecer sua disponibilidade e atenção",
+        "Conversar sempre que possível",
+        "Reconhecer frequentemente",
+        "Fazer follow-up" ] }
+    ]
+  },
+  S: {
+    nome: "Alto S",
+    cores: { escura: "#003E00", media: "#00C466", clara: "#BDF4CC" },
+    cartas: [
+      { categoria: "Características", itens: [
+        "Possuem uma forma definida de realizar tarefas",
+        "Trabalham em equipe, com disposição a servir",
+        "Querem sempre terminar o que começam",
+        "Levam estabilidade e previsibilidade para o ambiente de trabalho",
+        "Cultivam relacionamentos" ] },
+      { categoria: "Como delegar", itens: [
+        "Pontuar melhor os prazos",
+        "Oferecer bastante informação com antecedência",
+        "Se mostrar disponível",
+        "Delegar uma tarefa de cada vez",
+        "Tarefas que exijam paciência e persistência",
+        "Não botar muita pressão" ] },
+      { categoria: "Como dar feedback", itens: [
+        "Ser gentil e evitar palavras agressivas",
+        "Criar um ambiente seguro, em local privado.",
+        "Validar esforços antes de sugerir melhorias.",
+        "Trazer especificidades, com exemplos claros",
+        "Mostrar apoio, oferecendo ajuda" ] },
+      { categoria: "Como negociar", itens: [
+        "Demonstrar conhecimento, seguranças, referências na sua argumentação",
+        "Não utilizar pressão ou persuasão muito direta" ] },
+      { categoria: "Como desenvolver", itens: [
+        "Ter cautela ao comunicar mudanças",
+        "Demonstrar atenção frequentemente",
+        "Reconhecer sempre que possível",
+        "Encorajar que a pessoa auxilie colegas" ] }
+    ]
+  },
+  C: {
+    nome: "Alto C",
+    cores: { escura: "#001B71", media: "#007BEA", clara: "#B3DFFF" },
+    cartas: [
+      { categoria: "Características", itens: [
+        "Foco na perfeição em tudo o que faz",
+        "Detalhista e minuciosa",
+        "Necessidade de procedimentos bem definidos",
+        "Mente analítica",
+        "Buscam informações para tomarem decisões",
+        "Conformidade com a política definida" ] },
+      { categoria: "Como delegar", itens: [
+        "Planejar o que e como delegar, com detalhes",
+        "Trazer objetivos claros",
+        "Fazer alinhamento detalhado e informar as regras da tarefa",
+        "Dar atividades envolvendo lógica e embasamento" ] },
+      { categoria: "Como dar feedback", itens: [
+        "Oferecer feedback estruturado",
+        "Programar reuniões de feedback",
+        "Feedback lógico e bem embasado",
+        "Utilizar abordagem formal",
+        "Marcar hora e formalizar após" ] },
+      { categoria: "Como negociar", itens: [
+        "Ter precisão e organização, evitando imprecisões ou falhas",
+        "Mostrar como a proposta atende aos critérios de qualidade e eficiência",
+        "Ser paciente e dar tempo para a pessoa analisar as opções",
+        "Demonstrar confiança nas soluções apresentadas, sem pressa" ] },
+      { categoria: "Como desenvolver", itens: [
+        "Estimular o pensamento analítico com desafios.",
+        "Proporcionar oportunidades de aprendizado técnico.",
+        "Dar espaço para organizar ideias antes de decidir.",
+        "Oferecer feedback focado em melhorias.",
+        "Reconhecer a precisão e o cuidado nas tarefas." ] }
+    ]
+  }
+};
+
+const ORDEM = ["D", "I", "S", "C"];
+let ativo = "D";
+
+const elPerfis = document.getElementById("perfis");
+const elGrade = document.getElementById("grade");
+const elTitulo = document.getElementById("tituloPerfil");
+const elVirar = document.getElementById("virarTodas");
+
+function aplicarCores(c) {
+  const r = document.documentElement.style;
+  r.setProperty("--p-escura", c.escura);
+  r.setProperty("--p-media", c.media);
+  r.setProperty("--p-clara", c.clara);
+}
+
+function montarSeletor() {
+  ORDEM.forEach(function (k) {
+    const p = PERFIS[k];
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "perfil-btn";
+    b.setAttribute("role", "tab");
+    b.dataset.perfil = k;
+    b.style.setProperty("--c-escura", p.cores.escura);
+    b.style.setProperty("--c-media", p.cores.media);
+    b.style.setProperty("--c-clara", p.cores.clara);
+    b.innerHTML = '<span class="bolinha" aria-hidden="true"></span><span>' + p.nome + "</span>";
+    b.addEventListener("click", function () { selecionar(k); });
+    elPerfis.appendChild(b);
+  });
+}
+
+function montarCartas() {
+  const p = PERFIS[ativo];
+  elGrade.innerHTML = "";
+  p.cartas.forEach(function (c) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "carta";
+    btn.setAttribute("aria-pressed", "false");
+    btn.setAttribute("aria-label", p.nome + ": " + c.categoria + ". Clique para virar a carta.");
+
+    const itens = c.itens.map(function (t) { return "<li>" + t + "</li>"; }).join("");
+    btn.innerHTML =
+      '<div class="carta-interna">' +
+        '<div class="face frente">' +
+          '<div>' +
+            '<div class="perfil-nome">Alto</div>' +
+            '<div class="letra" aria-hidden="true">' + ativo + "</div>" +
+          "</div>" +
+          "<div>" +
+            '<div class="categoria">' + c.categoria + "</div>" +
+            '<div class="dica">Clique para virar</div>' +
+          "</div>" +
+        "</div>" +
+        '<div class="face verso">' +
+          '<div class="cat">' + c.categoria + "</div>" +
+          "<ul>" + itens + "</ul>" +
+        "</div>" +
+      "</div>";
+    btn.addEventListener("click", function () {
+      const on = btn.getAttribute("aria-pressed") === "true";
+      btn.setAttribute("aria-pressed", on ? "false" : "true");
+      atualizarBotaoVirar();
+    });
+    elGrade.appendChild(btn);
+  });
+  atualizarBotaoVirar();
+}
+
+function atualizarBotaoVirar() {
+  const cartas = elGrade.querySelectorAll(".carta");
+  const todas = Array.prototype.every.call(cartas, function (c) {
+    return c.getAttribute("aria-pressed") === "true";
+  });
+  elVirar.textContent = todas ? "Desvirar todas as cartas" : "Virar todas as cartas";
+}
+
+elVirar.addEventListener("click", function () {
+  const cartas = elGrade.querySelectorAll(".carta");
+  const todas = Array.prototype.every.call(cartas, function (c) {
+    return c.getAttribute("aria-pressed") === "true";
+  });
+  cartas.forEach(function (c) { c.setAttribute("aria-pressed", todas ? "false" : "true"); });
+  atualizarBotaoVirar();
+});
+
+function selecionar(k) {
+  ativo = k;
+  aplicarCores(PERFIS[k].cores);
+  elTitulo.textContent = "Perfil " + PERFIS[k].nome;
+  elPerfis.querySelectorAll(".perfil-btn").forEach(function (b) {
+    b.setAttribute("aria-selected", b.dataset.perfil === k ? "true" : "false");
+  });
+  montarCartas();
+}
+
+montarSeletor();
+selecionar("D");
+</script>
+</body>
+</html>
